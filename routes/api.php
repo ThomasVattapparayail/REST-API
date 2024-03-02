@@ -17,18 +17,16 @@ use App\Http\Controllers\CustomerController;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
-
-
+Route::middleware(['auth:api'])->group(function () {
+    Route::get('/user', function (Request $request) { return $request->user();});
+    Route::get('/products', [CustomerController::class, 'productList']);
+});
 
    //Customer Route
    
     Route::post('register', [CustomerController::class, 'register']);
     Route::post('login', [CustomerController::class, 'login']);
-    Route::get('products', [CustomerController::class, 'viewProductList']);
+   
 
     //Admin Route
 
