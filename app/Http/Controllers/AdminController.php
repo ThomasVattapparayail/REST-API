@@ -6,10 +6,11 @@ use App\Models\Product;
 use App\Models\Stock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\ProductRequest;
+
 
 class AdminController extends Controller
 {
-
 
     public function store(Request $request)
     {
@@ -87,18 +88,8 @@ class AdminController extends Controller
         return response()->json(['message' => 'Product added successfully', 'data' => $product], 201);
     }
 
-    public function editProduct(Request $request, Product $product)
+    public function editProduct(ProductRequest $request, Product $product)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-        ]);
-    
-        try {
-            $productFound = Product::findOrFail($product);
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => 'Product not found'], 404);
-        }
     
         $product->update([
             'name' => $request->name,
@@ -112,8 +103,6 @@ class AdminController extends Controller
     public function deleteProduct(Product $product)
     {
         $productFound=Product::find($product);
-
-        dd($productFound);
 
         if(!$productFound){
             return response()->json(['message' => 'Product not found']);
