@@ -27,12 +27,15 @@ class VendorController extends Controller
 
     public function addProduct(Request $request)
     {
-        $request->validate([
+        $validator= Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
-            
-            
         ]);
+
+        if ($validator->fails())
+         {
+            return response()->json([$validator->errors()], 403);
+         } 
 
         $product = Product::create([
             'name' => $request->name,
@@ -46,11 +49,16 @@ class VendorController extends Controller
 
     public function editProduct(Request $request, Product $product)
     {
-        $request->validate([
+        $validator= Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             
         ]);
+
+        if ($validator->fails())
+         {
+            return response()->json([$validator->errors()], 403);
+         }
 
         $product->update([
             'name' => $request->name,

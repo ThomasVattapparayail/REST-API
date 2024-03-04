@@ -7,20 +7,23 @@ use App\Models\Stock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\ProductRequest;
-
+use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
 {
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validator= Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'address'=>'required|string',
             
         ]);
     
-        
+        if ($validator->fails()) {
+            return response()->json([$validator->errors()], 403);
+          }
+
         $vendor = Vendor::create([
             'name' => $request->name,
             'address'=>$request->address,
@@ -32,11 +35,15 @@ class AdminController extends Controller
 
     public function update(Request $request, Vendor $vendor)
     {
-        $request->validate([
+        $validator= Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'address'=>'required|string',
             
         ]);
+        
+        if ($validator->fails()) {
+            return response()->json([$validator->errors()], 403);
+          }
          
         $vendorFind=Vendor::find($vendor);
 
@@ -70,13 +77,16 @@ class AdminController extends Controller
 
     public function addProduct(Request $request)
     {
-        $request->validate([
+        $validator= Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'vendor_id'=>'required'
-            
-            
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([$validator->errors()], 403);
+          }    
+
 
         $product = Product::create([
             'name' => $request->name,
@@ -88,13 +98,18 @@ class AdminController extends Controller
         return response()->json(['message' => 'Product added successfully', 'data' => $product], 201);
     }
 
-    public function editProduct(ProductRequest $request, Product $product)
+    public function editProduct(Request $request, Product $product)
     {
     
+        if(!$product){
+            abort(404, 'Product not found');
+        }
         $product->update([
             'name' => $request->name,
             'price' => $request->price,
         ]);
+
+        
     
         return response()->json(['message' => 'Product updated successfully', 'data' => $productFound]);
     }
@@ -114,11 +129,15 @@ class AdminController extends Controller
 
     public function addStock(Request $request)
     {
-        $request->validate([
+        $validator= Validator::make($request->all(), [
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:0',
            
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([$validator->errors()], 403);
+          } 
 
         $stock = Stock::create([
             'product_id' => $request->product_id,

@@ -13,13 +13,17 @@ class CustomerController extends Controller
 
     public function register(Request $request)
     {
-        $validator=$request->validate([
+        $validator= Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users,email',
             'password' => 'required|string|min:6',
             'role_id'=>'required'
         ]);
-        //dd($validator);
+        
+        if ($validator->fails())
+         {
+            return response()->json([$validator->errors()], 403);
+         }
     
 
         $user = User::create([
